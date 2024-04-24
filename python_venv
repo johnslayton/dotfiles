@@ -1,0 +1,55 @@
+
+
+source_venvwrapper ()
+{
+	# source virtualenvwrapper to setup it's shell functions
+	## NB export PATH prior to sourcing virtualenvwrapper.sh
+
+	# MAGIC usually installed here if using `pip install --user` (recommended)
+	local venv_user="$HOME"/.local/bin/virtualenvwrapper.sh
+	# MAGIC installed here if installed via sudo (not recommended)
+	local venv_local=/usr/local/bin/virtualenvwrapper.sh
+	local venv_share=/usr/share/virtualenvwrapper/virtualenvwrapper.sh
+
+	if [ -f "$venv_user" ]; then
+		source "$venv_user"
+	elif [ -f "$venv_local" ]; then
+		source "$venv_local"
+	elif [ -f "$venv_share" ]; then
+		source "$venv_share"
+	else
+		echo "could not source virtualenvwrapper.sh!"
+		echo "  not a file: $venv_user"
+		echo "  not a file: $venv_local"
+		echo "  not a file: $venv_share"
+	fi
+}
+
+
+append_to_path() {
+		# append $1 to PATH if it is *not* already in the PATH
+		# SEE https://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
+
+	if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+		PATH+=:"$1"
+	fi
+}
+
+
+# SEE https://virtualenvwrapper.readthedocs.io/en/latest/install.html
+
+export VIRTUALENVWRAPPER_PYTHON=`which python3`             # use this interpreter
+export WORKON_HOME="$HOME"/.virtualenvs                     # environments dir
+export VIRTUALENVWRAPPER_TMPDIR="$HOME"/.virtualenv_tmpdir  # cache dir
+export PIP_DOWNLOAD_CACHE="$HOME"/.pip/cache                # use home in case /tmp is not large enough
+
+#export PROJECT_HOME="$HOME"/.virtualenv_projects           # project working dir (i.e. source code under dev)
+#export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv  # use this virtualenv binary
+
+# NB you must amend your path prior to sourcing venvwrapper
+#    as it uses the current path to find the binaries and etc.
+# SEE https://virtualenvwrapper.readthedocs.io/en/latest/install.html#python-interpreter-virtualenv-and-path
+# NB add ~/.local/bin to the PATH b/c virtualenv can get installed there if you use `pip install --user`
+append_to_path "$HOME"/.local/bin
+
+source_venvwrapper
